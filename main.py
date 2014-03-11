@@ -49,7 +49,7 @@ while (not xbmc.abortRequested):
     title = xbmc.getInfoLabel('Player.Title') if p.isPlaying() else 'stopped desu.'
     if title != last_title:
       last_title = title
-      draw_lines(textwrap.wrap(title, 23), (1 if p.isPlaying() else 0))
+      draw_lines(textwrap.wrap(title.decode('UTF-8').encode('ascii', 'ignore'), 23), (1 if p.isPlaying() else 0))
     if p.isPlaying():
       draw_time()
     time.sleep(1)
