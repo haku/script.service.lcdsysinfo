@@ -41,7 +41,7 @@ def draw_time():
   line = str(datetime.timedelta(seconds=int(p.getTime()))) \
       + ' of ' \
       + str(datetime.timedelta(seconds=int(p.getTotalTime())))
-  d.display_text_on_line(1, line, False, None, fg)
+  d.display_text_on_line(1, line, False, None, TextColours.WHITE)
 
 while (not xbmc.abortRequested):
   last_title = None
