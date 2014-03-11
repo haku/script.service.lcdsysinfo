@@ -29,10 +29,9 @@ d.set_text_background_colour(bg)
 
 def draw_lines(lines, first = 0):
   for i in range(0, (6 - first)):
+    d.clear_lines(1 << (first + i), bg)
     if i < len(lines):
       d.display_text_on_line(1 + first + i, lines[i], False, None, fg)
-    else:
-      d.clear_lines(1 << (first + i), bg)
 
 draw_lines(['starting desu ...'])
 
