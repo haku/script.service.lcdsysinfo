@@ -2,6 +2,7 @@
 # http://wiki.xbmc.org/index.php?title=Python_development
 # http://wiki.xbmc.org/index.php?title=HOW-TO_write_Python_Scripts
 # http://romanvm.github.io/xbmcstubs/docs/classxbmc_1_1_player.html
+# http://wiki.xbmc.org/?title=InfoLabels
 
 import os
 import time
@@ -14,7 +15,7 @@ __settings__ = xbmcaddon.Addon(id='script.service.lcdsysinfo')
 __cwd__ = __settings__.getAddonInfo('path')
 BASE_RESOURCE_PATH = xbmc.translatePath(os.path.join( __cwd__, 'resources', 'lib'))
 sys.path.append (BASE_RESOURCE_PATH)
-from pylcdsysinfo import LCDSysInfo, TextLines, TextLines, BackgroundColours, TextColours
+from pylcdsysinfo import LCDSysInfo, TextLines, BackgroundColours, TextColours
 
 bg = BackgroundColours.BLACK
 fg = TextColours.GREEN
@@ -26,36 +27,32 @@ d.set_brightness(127)
 d.save_brightness(127, 255)
 d.set_text_background_colour(bg)
 
-d.display_text_on_line(1, "starting desu~ ...", False, None, fg)
+def draw_lines(lines, first = 0):
+  for i in range(0, (6 - first)):
+    if i < len(lines):
+      d.display_text_on_line(1 + first + i, lines[i], False, None, fg)
+    else:
+      d.clear_lines(1 << (first + i), bg)
+
+draw_lines(['starting desu ...'])
 
 p = xbmc.Player()
 
-while (not xbmc.abortRequested):
-  while 1:
-    if p.isPlaying():
-      line1 = "Playing desu~"
-      line2 = str(datetime.timedelta(seconds=int(p.getTime()))) \
-          + " of " \
-          + str(datetime.timedelta(seconds=int(p.getTotalTime())))
-      title_lines = textwrap.wrap(p.getPlayingFile(), 23)
-      line3 = title_lines[0] if len(title_lines) >= 1 else ""
-      line4 = title_lines[1] if len(title_lines) >= 2 else ""
-      line5 = title_lines[2] if len(title_lines) >= 3 else ""
-      line6 = title_lines[3] if len(title_lines) >= 4 else ""
-    else:
-      line1 = "stopped desu~"
-      line2 = ""
-      line3 = ""
-      line4 = ""
-      line5 = ""
-      line6 = ""
+def draw_time():
+  line = str(datetime.timedelta(seconds=int(p.getTime()))) \
+      + ' of ' \
+      + str(datetime.timedelta(seconds=int(p.getTotalTime())))
+  d.display_text_on_line(1, line, False, None, fg)
 
-    d.display_text_on_line(1, line1, False, None, fg)
-    d.display_text_on_line(2, line2, False, None, fg)
-    d.display_text_on_line(3, line3, False, None, fg)
-    d.display_text_on_line(4, line4, False, None, fg)
-    d.display_text_on_line(5, line5, False, None, fg)
-    d.display_text_on_line(6, line6, False, None, fg)
+while (not xbmc.abortRequested):
+  last_title = None
+  while 1:
+    title = xbmc.getInfoLabel('Player.Title') if p.isPlaying() else 'stopped desu.'
+    if title != last_title:
+      last_title = title
+      draw_lines(textwrap.wrap(title, 23), (1 if p.isPlaying() else 0))
+    if p.isPlaying():
+      draw_time()
     time.sleep(1)
 
-d.display_text_on_line(1, "shutdown desu~", False, None, fg)
+draw_lines(['shutdown desu.'])
